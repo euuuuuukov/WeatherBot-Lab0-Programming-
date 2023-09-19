@@ -7,6 +7,12 @@ TOKEN = '6058507940:AAEAb_bmD0lXXT_a742jKCXlHrYRfaGNsaI'
 bot = telebot.TeleBot(TOKEN)
 API_open_weather = 'c507bcf8971af71b550c3281cad1b275'
 
+=======
+from telebot import TeleBot
+
+token = '6058507940:AAEAb_bmD0lXXT_a742jKCXlHrYRfaGNsaI'
+bot = TeleBot(token)
+
 
 @bot.message_handler(commands=['start', 'menu'])
 def start(message):
