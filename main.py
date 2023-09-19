@@ -1,17 +1,19 @@
-import telebot
+from telebot import TeleBot
 
-TOKEN = '6058507940:AAEAb_bmD0lXXT_a742jKCXlHrYRfaGNsaI'
-bot = telebot.TeleBot(TOKEN)
+token = '6058507940:AAEAb_bmD0lXXT_a742jKCXlHrYRfaGNsaI'
+bot = TeleBot(token)
+
 
 @bot.message_handler(commands=['start', 'menu'])
 def start(message):
-    bot.send_message(message.chat.id, f'Здравствуйте, {message.from_user.first_name}, я универсальный чат-бот для выдачи информации о погоде.\nДля выдачи информации о погоде в городе введите его название.')
+    bot.send_message(message.chat.id,
+                     f'Привет, {message.from_user.first_name}! Я универсальный чат-бот для выдачи информации о '
+                     f'погоде.\nДля выдачи информации о погоде в городе введи его название:')
+
 
 @bot.message_handler(content_types=['text'])
 def get_weather(message):
     city = message.text.strip().lower()
-
-
 
 
 bot.polling(none_stop=1)
