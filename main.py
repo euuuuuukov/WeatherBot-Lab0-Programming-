@@ -26,9 +26,13 @@ def choose_lang(message):
 
 @bot.message_handler(commands=['start', 'menu'])
 def start(message):
-    print(message.from_user.first_name == None, message.from_user.last_name == None)
+    username = ''
+    if message.from_user.first_name:
+        username += message.from_user.first_name
+    if message.from_user.last_name:
+        username += message.from_user.last_name
     bot.send_message(message.chat.id,
-                     f'Привет, {message.from_user.first_name} {message.from_user.last_name}! Я универсальный чат-бот для выдачи информации о '
+                     f'Привет, {username}! Я универсальный чат-бот для выдачи информации о '
                      f'погоде.\nДля выдачи информации о погоде в городе введи его название:')
 
 
@@ -49,7 +53,7 @@ def get_weather(message):
         conditions = data['weather'][0]['description']
         pressure = data['main']['pressure']
         humidity = data['main']['humidity']
-        bot.reply_to(message, f'Температура в городе {city}: {temp} °C, ощущается как {real_temp} °C\nПогодные условия: '
+        bot.reply_to(message, f'Температура в городе {city}: {temp} °C, ощущается как {real_temp} °C\nПогодные условия:'
                               f'{conditions}\nДавление воздуха: {pressure} гПа\nВлажность воздуха: {humidity}%')
         if 'clear sky' in conditions:
             sticker_id = 'CAACAgIAAxkBAAEKWRdlC0Wx9frwcRPpLexyORlPRdSaqgAC1DEAAqY7WEjqpGH2oeOzlTAE'
@@ -67,12 +71,16 @@ def get_weather(message):
     else:
         bot.send_message(message.chat.id, 'Название города некорректно')
 
+
 @bot.message_handler(content_types=['photo', 'audio', 'voice', 'video', 'text', 'sticker', 'gif'])
-def UnknownType(message):
-    bot.reply_to(message, 'Я не определил вашу команду\nВведите <u>/start</u> , чтобы продолжить', parse_mode='html')
+def unknown_type(message):
+    bot.reply_to(message, 'Я не определил вашу команду\nВведите <u>/start</u>, чтобы продолжить', parse_mode='html')
+
 
 @bot.message_handler(content_types=['location'])
-def LocationType(message):
-    bot.reply_to(message, 'Я не умею работать с геолокацией\nВведите <u>/start</u> , чтобы продолжить', parse_mode='html')
+def location_type(message):
+    bot.reply_to(message, 'Я не умею работать с геолокацией\nВведите <u>/start</u>, чтобы продолжить',
+                 parse_mode='html')
+
 
 bot.polling(none_stop=True)
