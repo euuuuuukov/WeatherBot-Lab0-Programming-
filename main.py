@@ -1,4 +1,5 @@
 from telebot import TeleBot
+from telebot import types
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from requests import get
 from json import loads
@@ -32,14 +33,44 @@ def start(message):
     if message.from_user.last_name:
         username += ' ' + message.from_user.last_name
     username = username.strip()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    weather_button = types.KeyboardButton('🏙 Выбор города')
+    weather_location_button = types.KeyboardButton('🗺 Погода по геолокации')
+    language_button = types.KeyboardButton('🇺🇸 Выбор языка')
+    information_button = types.KeyboardButton('ℹ️ Информация')
+    settings_button = types.KeyboardButton('🔧 Настройки')
+    donate_button = types.KeyboardButton('💸 Поддержать проект')
+    markup.add(weather_button, weather_location_button, language_button, information_button, settings_button, donate_button)
     bot.send_message(message.chat.id,
                      f'Привет, {username}! Я универсальный чат-бот для выдачи информации о '
-                     f'погоде.\nДля выдачи информации о погоде в городе введи его название:')
+                     f'погоде.\nВыбери то, что тебе нужно:', reply_markup=markup)
+
+
+
+
+@bot.message_handler(func=lambda message: message.text == 'ℹ️ Информация')
+def information(message):
+    bot.send_message(message.chat.id, 'Данный бот создан группой разработчиков из России, представлен в более чем сотне языков мира.'
+                                      '\nСоздан для выдачи информации о погоде в выбранных пользователями городах.'
+                                      '\nНаписан на языке программирования Python c использованием библиотек:\nTelebot, json, requests, googletrans, loggging.')
+
+
+@bot.message_handler(func=lambda message: message.text == '🏙 Выбор города')
+def choose_city(message):
+    bot.send_message(message.chat.id, f'Введите название города: ')
 
 
 @bot.message_handler(func=lambda message: message.text.strip().lower() in langs_names)
 def switch_lang(message):
     bot.send_message(message.chat.id, f'Your language: {message.text.strip().lower()}')
+
+
+@bot.message_handler(func=lambda message: message.text == '💸 Поддержать проект')
+def donate(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('Поддержать', url = 'https://google.com'))
+    bot.send_message(message.chat.id, 'Спасибо, что поддерживаете наш продукт, так мы станем лучше.', reply_markup=markup)
+    
 
 
 @bot.message_handler(content_types=['text'])
@@ -54,26 +85,26 @@ def get_weather(message):
         conditions = data['weather'][0]['description']
         pressure = data['main']['pressure']
         humidity = data['main']['humidity']
-        bot.reply_to(message, f'Температура в городе {city}: {temp} °C, ощущается как {real_temp} °C\nПогодные условия:'
+        bot.reply_to(message, f'Температура в городе {city}: {temp} °C, ощущается как {real_temp} °C\nПогодные условия: '
                               f'{conditions}\nДавление воздуха: {pressure} гПа\nВлажность воздуха: {humidity}%')
         if 'clear sky' in conditions:
-            sticker_id = 'CAACAgIAAxkBAAEKWRdlC0Wx9frwcRPpLexyORlPRdSaqgAC1DEAAqY7WEjqpGH2oeOzlTAE'
+            sticker_id = 'CAACAgIAAxkBAAEKWV9lC2QKSuI1rAHW6qA-v9CBnw00iQACOzYAAjVQYUjAUz1pjKjxtjAE'
         elif 'light rain' in conditions:
             sticker_id = 'CAACAgIAAxkBAAEKWS9lC1GI2grIW91nBQc7h4R2Iet8JwACPDcAAjTpUEiCyCmPfMIF2jAE'
         elif 'moderate rain' in conditions:
             sticker_id = 'CAACAgIAAxkBAAEKWTxlC1PpXf-hn28iQriymSDihXzIsAAC90AAAqfUWUilawirv5bpLzAE'
         elif 'heavy intensity rain' in conditions:
             sticker_id = 'CAACAgIAAxkBAAEKWS1lC1EWKMRvJ_pxkL3r3YZItnx28QACMzwAAtaTYEjjYaSA5JG9ZTAE'
-        elif 'overcast clouds' in conditions or 'broken clouds' in conditions:
+        elif 'overcast clouds' in conditions or 'broken clouds' in conditions or 'scattered clouds' in conditions:
             sticker_id = 'CAACAgIAAxkBAAEKWSZlC0iq2_M72eEYRmnqB_tQr92KgQACsjkAAkdbWEhyZFRbA_1pHzAE'
-        elif 'mist' in conditions or 'fog' in conditions:
+        elif 'mist' in conditions or 'smoke' in conditions:
             sticker_id = 'CAACAgIAAxkBAAEKWFdlCvMgbEyu0ovY3RTLWljNlCQNsgACrTgAAq4lWUjCR7-2E9FdODAE'
         bot.send_sticker(message.chat.id, sticker_id)
     else:
         bot.send_message(message.chat.id, 'Название города некорректно')
 
 
-@bot.message_handler(content_types=['photo', 'audio', 'voice', 'video', 'text', 'sticker', 'gif'])
+@bot.message_handler(content_types=['audio', 'document', 'animation', 'game', 'photo', 'sticker', 'video', 'video_note', 'voice', 'contact', 'venue', 'dice', 'invoice', 'successful_payment', 'connected_website', 'poll', 'passport_data', 'web_app_data'])
 def unknown_type(message):
     bot.reply_to(message, 'Я не определил вашу команду\nВведите <u>/start</u>, чтобы продолжить', parse_mode='html')
 
