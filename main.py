@@ -30,7 +30,8 @@ def start(message):
     if message.from_user.first_name:
         username += message.from_user.first_name
     if message.from_user.last_name:
-        username += message.from_user.last_name
+        username += ' ' + message.from_user.last_name
+    username = username.strip()
     bot.send_message(message.chat.id,
                      f'Привет, {username}! Я универсальный чат-бот для выдачи информации о '
                      f'погоде.\nДля выдачи информации о погоде в городе введи его название:')
