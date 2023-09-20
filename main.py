@@ -67,5 +67,12 @@ def get_weather(message):
     else:
         bot.send_message(message.chat.id, 'Название города некорректно')
 
+@bot.message_handler(content_types=['photo', 'audio', 'voice', 'video', 'text', 'sticker', 'gif'])
+def UnknownType(message):
+    bot.reply_to(message, 'Я не определил вашу команду\nВведите <u>/start</u> , чтобы продолжить', parse_mode='html')
+
+@bot.message_handler(content_types=['location'])
+def LocationType(message):
+    bot.reply_to(message, 'Я не умею работать с геолокацией\nВведите <u>/start</u> , чтобы продолжить', parse_mode='html')
 
 bot.polling(none_stop=True)
