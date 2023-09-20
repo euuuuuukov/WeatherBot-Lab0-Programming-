@@ -1,3 +1,4 @@
+from telebot import TeleBot
 from requests import get
 from json import loads
 from googletrans import Translator
