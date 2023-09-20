@@ -1,4 +1,3 @@
-from telebot import TeleBot
 from requests import get
 from json import loads
 from googletrans import Translator
@@ -26,11 +25,12 @@ def get_weather(message):
         city = translator.translate(data['name'], src='en', dest='ru').text
         bot.reply_to(message, str(data))
         temp = data['main']['temp']
+        real_temp = data['main']['feels_like']
         conditions = data['weather'][0]['description']
         pressure = data['main']['pressure']
         humidity = data['main']['humidity']
-        bot.reply_to(message, f'Температура в городе {city}: {temp} °C\nПогодные условия: {conditions}\n'
-                              f'Давление воздуха: {pressure} гПа\nВлажность воздуха: {humidity}%')
+        bot.reply_to(message, f'Температура в городе {city}: {temp} °C, ощущается как {real_temp} °C\nПогодные условия: '
+                              f'{conditions}\nДавление воздуха: {pressure} гПа\nВлажность воздуха: {humidity}%')
 
         if 'clear sky' in conditions:
             pass
