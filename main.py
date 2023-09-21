@@ -37,7 +37,7 @@ def get_weather(message: Message, result: Response) -> None:
         wind = data['wind']['speed']
         bot.reply_to(message,
                      f'Сейчас в городе {city}: \n'
-                     f'🌡+{temp} °C, ощущается как +{real_temp} °C'
+                     f'🌡{temp} °C, ощущается как {real_temp} °C'
                      f'\n↗️Ветер: {wind} м/с'
                      f'\n🌥Погодные условия: '
                      f'{conditions}'
