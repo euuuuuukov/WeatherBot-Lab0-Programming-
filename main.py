@@ -22,9 +22,6 @@ back_markup = ReplyKeyboardMarkup(resize_keyboard=True)
 back_markup.add(KeyboardButton('🔙 Назад'))
 
 
-
-
-
 def get_weather(message: Message, result: Response) -> None:
     if result.status_code == 200:
         data = loads(result.text)
@@ -32,18 +29,15 @@ def get_weather(message: Message, result: Response) -> None:
         temp = data['main']['temp']
         real_temp = data['main']['feels_like']
         conditions = data['weather'][0]['description']
-        pressure = data['main']['pressure']
+        pressure = f'{str(int(data["main"]["pressure"] * 100 / 1.333))[:-2]}.' \
+                   f'{str(int(data["main"]["pressure"] * 100 / 1.333))[-2:]}'
         humidity = data['main']['humidity']
         wind = data['wind']['speed']
         bot.reply_to(message,
-                     f'Сейчас в городе {city}: \n'
-                     f'🌡{temp} °C, ощущается как {real_temp} °C'
-                     f'\n↗️Ветер: {wind} м/с'
-                     f'\n🌥Погодные условия: '
-                     f'{conditions}'
-                     f'\n⏲Давление: {int(pressure/1.333)} мм. рт. ст.'
-                     f'\n💧Влажность: '
-                     f'{humidity}%')
+                     f'Сейчас в городе {city}:\n🌡Температура: {temp} °C, ощущается как {real_temp} °C\n'
+                     f'↗️Ветер: {wind} м/с\n🌥Погодные условия: {conditions}\n⏲Давление: {pressure} мм. рт. ст.\n'
+                     f'💧Влажность: {humidity}%')
+        sticker_id = ''
         if conditions == 'clear sky':
             sticker_id = 'CAACAgIAAxkBAAEKWV9lC2QKSuI1rAHW6qA-v9CBnw00iQACOzYAAjVQYUjAUz1pjKjxtjAE'
         elif conditions == 'light rain':
