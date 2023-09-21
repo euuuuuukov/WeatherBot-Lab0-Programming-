@@ -1,3 +1,4 @@
+import time
 from telebot import TeleBot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton,\
     ReplyKeyboardRemove
@@ -6,6 +7,9 @@ from json import loads
 from googletrans import Translator, LANGCODES
 from logging import basicConfig, getLogger, DEBUG
 from sqlite3 import connect
+import schedule
+from schedule import every, repeat, run_pending
+from pytz import timezone
 
 
 basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=DEBUG)
@@ -15,6 +19,11 @@ bot = TeleBot(TOKEN)
 API_open_weather = 'c507bcf8971af71b550c3281cad1b275'
 translator = Translator(service_urls=['translate.googleapis.com'])
 langs_names = list(LANGCODES.keys())
+
+
+# @repeat(every().day.at('15:29', timezone('Europe/Moscow')))
+def msg(message):
+    bot.send_message(message.chat.id, 'Доброе утро, хотите узнать актуальную погоду?')
 
 
 def get_weather(message, result):
@@ -28,7 +37,7 @@ def get_weather(message, result):
         humidity = data['main']['humidity']
         bot.reply_to(message,
                      f'Температура в городе {city}: {temp} °C, ощущается как {real_temp} °C\nПогодные условия: '
-                     f'{conditions}\nДавление воздуха: {pressure} гПа\nВлажность воздуха: {humidity}%')
+                     f'{conditions}\nДавление воздуха: {int(pressure/1.333)} мм. рт. столба\nВлажность воздуха: {humidity}%')
         if conditions == 'clear sky':
             sticker_id = 'CAACAgIAAxkBAAEKWV9lC2QKSuI1rAHW6qA-v9CBnw00iQACOzYAAjVQYUjAUz1pjKjxtjAE'
         elif conditions == 'light rain':
@@ -77,6 +86,7 @@ def choose_city(message):
 @bot.message_handler(func=lambda message: message.text == '🗺 Погода по геолокации')
 def weather_by_location(message):
     pass
+
 
 
 @bot.message_handler(func=lambda message: message.text == '🇺🇸 Выбор языка')
@@ -139,12 +149,17 @@ def location_type(message):
     get_weather(message, result)
 
 
-@bot.message_handler(
-    content_types=['audio', 'document', 'animation', 'game', 'photo', 'sticker', 'video', 'video_note', 'voice',
+@bot.message_handler(content_types=['audio', 'document', 'animation', 'game', 'photo', 'sticker', 'video', 'video_note', 'voice',
                    'contact', 'venue', 'dice', 'invoice', 'successful_payment', 'connected_website', 'poll',
                    'passport_data', 'web_app_data'])
 def unknown_type(message):
-    bot.reply_to(message, 'Я пока не умею работать с файлами\nВведи /start, чтобы продолжить', parse_mode='html')
+    bot.reply_to(message, 'Я не распознал введенные вами данные😢\nВведи /start, чтобы продолжить', parse_mode='html')
+
+
 
 
 bot.polling(none_stop=True)
+schedule.every().day.at('15:31', timezone('Europe/Moscow')).do(msg)
+while True:
+    schedule.run_pending()
+    time.sleep(1)
