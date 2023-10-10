@@ -1,4 +1,5 @@
 import schedule
+import time
 from telebot import TeleBot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from requests import get, Response
@@ -21,8 +22,6 @@ menu_markup.add(KeyboardButton('🔧 Настройки'), KeyboardButton('✍�
 menu_markup.add(KeyboardButton('💸 Поддержать проект'))
 back_markup = ReplyKeyboardMarkup(resize_keyboard=True)
 back_markup.add(KeyboardButton('🔙 Назад в меню'))
-
-
 
 
 def get_weather(message: Message, result: Response) -> None:
@@ -59,10 +58,6 @@ def get_weather(message: Message, result: Response) -> None:
         bot.send_sticker(message.chat.id, sticker_id, reply_markup=back_markup)
     else:
         bot.send_message(message.chat.id, 'Название города некорректно, введи еще раз:')
-
-
-def Greetings(message):
-    bot.send_message('Здравствуйте, хотите узнать актуальную погоду?')
 
 
 @bot.message_handler(commands=['start'])
@@ -108,20 +103,31 @@ def information(message: Message) -> None:
     markup.add(KeyboardButton('🔙 Назад в настройки'))
     bot.send_message(message.chat.id,
                      'Данный бот создан группой разработчиков из России, представлен в более чем сотне языков мира.\n'
-                     'Создан для выдачи информации о погоде в выбранных пользователями городах.\n'
+                     'Создан для выдачи информации о погоде в выбранных пользователями городах\n'
+                     'Поддерживает работу по геолокации пользователя.\n'
                      'Написан на языке программирования Python c использованием следующих библиотек:\n'
-                     'telebot, json, requests, googletrans, logging.', reply_markup=markup)
+                     'telebot, json, requests, googletrans, logging.\n\n'
+                     'Контакты разработчиков:\n'
+                     '<a href="https://t.me/tonnrryyy">Мещеряков Даниил</a>\n'
+                     '<a href="https://t.me/t_m_s_o_s_n">Коваленко Евгений</a>\n'
+                     '<a href="https://t.me/yelotfn">Гельм Даниил</a>\n', reply_markup=markup, parse_mode='HTML')
 
 
 @bot.message_handler(func=lambda message: message.text == '🔧 Настройки')
 def settings(message: Message) -> None:
     settings_markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
-    settings_markup.add(KeyboardButton('🗒 Запомнить город'))
-    settings_markup.add(KeyboardButton('🗺 Запомнить город по геолокации'))
+    settings_markup.add(KeyboardButton('🗒 Запомнить город по геолокации'))
     settings_markup.add(KeyboardButton('🇺🇸 Выбор языка'), KeyboardButton('ℹ️ Информация'))
     settings_markup.add(KeyboardButton('🔙 Назад в меню'))
     bot.send_message(message.chat.id, 'Вы перешли в настройки', reply_markup=settings_markup)
+
+
+@bot.message_handler(func=lambda message: message.text == '🗒 Запомнить город по геолокации')
+def remember_city(message):
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(KeyboardButton('🔙 Назад в настройки'))
+    bot.send_message(message.chat.id, 'Отправьте вашу геолокацию:', reply_markup=markup)
 
 
 @bot.message_handler(func=lambda message: message.text == '💸 Поддержать проект')
@@ -143,6 +149,7 @@ def write(message: Message) -> None:
 @bot.message_handler(func=lambda message: message.text == '🔙 Назад в меню')
 def back_menu(message: Message) -> None:
     menu(message)
+
 
 @bot.message_handler(func=lambda message: message.text == '🔙 Назад в настройки')
 def back_settings(message: Message) -> None:
@@ -174,13 +181,9 @@ def location_type(message: Message) -> None:
                                     'voice', 'contact', 'venue', 'dice', 'invoice', 'successful_payment',
                                     'connected_website', 'poll', 'passport_data', 'web_app_data'])
 def unknown_type(message: Message) -> None:
-    bot.reply_to(message, 'Я не распознал введенные вами данные😢\nНажмите кнопку 🔙 Назад в меню, чтобы вернуться в меню',
+    bot.reply_to(message, 'Я не распознал введенные вами данные😢'
+                          '\nНажмите кнопку 🔙 Назад в меню, чтобы вернуться в меню',
                  parse_mode='html', reply_markup=back_markup)
 
-def schedule_sending():
-    schedule.every(4).seconds.do(Greetings)
-
-    while True:
-        schedule.run_pending()
 
 bot.polling(none_stop=True)
