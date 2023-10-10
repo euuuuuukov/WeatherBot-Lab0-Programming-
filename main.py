@@ -62,6 +62,8 @@ def get_weather(message: Message, result: Response) -> None:
 
 @bot.message_handler(commands=['start'])
 def start(message: Message) -> None:
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(KeyboardButton('Да'), KeyboardButton('Нет'))
     username = ''
     if message.from_user.first_name:
         username += message.from_user.first_name
@@ -72,14 +74,25 @@ def start(message: Message) -> None:
                      f'Привет, {username}! Я универсальный чат-бот для выдачи информации о погоде.\nПродолжая '
                      f'пользоваться ботом, ты даешь свое <a href="https://docs.google.com/document/d/'
                      f'1Y8jrM_0F6xaME0gTi3hUVM7O6FSjxAIFiSFuyHFIt2E/edit?usp=sharing">согласие на обработку '
-                     f'персональных данных</a>\n\nВыбери то, что тебе нужно:', reply_markup=menu_markup,
-                     parse_mode='HTML')
+                     f'персональных данных</a>', parse_mode='HTML')
 
+    bot.send_message(message.chat.id, 'Вы подтверждаете свое согласие на обработку персональных данных:', reply_markup=markup)
+
+@bot.message_handler(func=lambda message: message.text == 'Да')
+def accept(message):
+    menu(message)
+
+
+@bot.message_handler(func=lambda message: message.text == 'Нет')
+def decline(message):
+    bot.send_message(message.chat.id, 'Для дальнейшего использования бота'
+                                      '\nВам необходимо принять соглашение')
+    start(message)
 
 @bot.message_handler(commands=['menu'])
 def menu(message: Message) -> None:
     bot.send_message(message.chat.id,
-                     f'Ты вернулся в меню!\nВыбери то, что тебе нужно:', reply_markup=menu_markup)
+                     f'Вы перешли в меню!\nВыбери то, что тебе нужно:', reply_markup=menu_markup)
 
 
 @bot.message_handler(func=lambda message: message.text == '🏙 Выбор города')
