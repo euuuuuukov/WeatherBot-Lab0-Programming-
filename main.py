@@ -164,8 +164,8 @@ def information(message: Message) -> None:
                                 'cities selected by users.\nSupports working with user geolocation.\nWritten in the '
                                 'Python programming language using the following libraries:', src='en', dest=lang).text
     txt2 = translator.translate('Developers contacts:', src='en', dest=lang).text
-    bot.send_message(chat_id, f'{txt1}\ntelebot, json, requests, googletrans, logging.\n\n{txt2}\n<a '
-                              f'href="https://t.me/tonnrryyy">Meshcheryakov Daniil</a>\n<a '
+    bot.send_message(chat_id, f'{txt1}\ntelebot, json, requests, googletrans, googletrans, gspread, logging.\n\n{txt2}'
+                              f'\n<a href="https://t.me/tonnrryyy">Meshcheryakov Daniil</a>\n<a '
                               f'href="https://t.me/t_m_s_o_s_n">Kovalenko Evgeniy</a>\n<a href="https://t.me/yelotfn">'
                               f'Helm Daniil</a>', parse_mode='HTML', reply_markup=settings_markup)
 
